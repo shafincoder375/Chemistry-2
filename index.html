@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chemistry Explorer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #222; min-height: 100vh; }
+    .hidden { display: none; }
+    #loginPage, #mainPage { width: 100%; height: 100vh; position: absolute; top: 0; left: 0; }
+    #loginPage { background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; }
+    #loginBox { background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); text-align: center; }
+    #loginBox input { width: 100%; padding: .75rem; margin-top: 1rem; border-radius: 999px; border: 1px solid #ccc; }
+    #loginBox button { margin-top: 1rem; padding: .75rem 2rem; border: none; border-radius: 999px; background: #4facfe; color: #fff; cursor: pointer; transition: background .3s; }
+    #loginBox button:hover { background: #00f2fe; }
+    #loginError { color: #ff3333; margin-top: .5rem; }
+    #welcomePopup { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: #fff; padding: 1rem 2rem; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); display: none; }
+    header { padding: 1rem; text-align: center; font-size: 2rem; color: #fff; background: rgba(0,0,0,0.2); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+    #profile { position: fixed; top: 1rem; right: 1rem; cursor: pointer; }
+    .profile-icon { font-size: 1.5rem; color: #fff; }
+    #profileMenu { position: absolute; top: 2rem; right: .5rem; background: #fff; color: #000; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); display: none; padding: .5rem; text-align: center; }
+    #profileMenu p { margin: .5rem 0; font-weight: bold; }
+    #profileMenu button { border: none; background: #ff5e5e; color: #fff; padding: .5rem 1rem; border-radius: 6px; cursor: pointer; }
+    #searchBar { display: block; width: 90%; max-width: 400px; margin: 1rem auto; padding: .75rem 1rem; font-size: 1rem; border: none; border-radius: 999px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    #cardsContainer { display: grid; gap: 1rem; padding: 1rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .element-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: transform .3s; position: relative; }
+    .element-card:hover { transform: translateY(-5px); }
+    .card-header { background: #4facfe; color: #fff; padding: .75rem; text-align: center; }
+    .card-body { padding: .75rem 1rem; font-size: .9rem; line-height: 1.4; }
+    .video-toggle { position: absolute; bottom: .5rem; right: .5rem; background: rgba(0,0,0,0.5); padding: .3rem .5rem; border-radius: 6px; color: #fff; cursor: pointer; }
+    @media (max-width: 600px) { header { font-size: 1.5rem; } #searchBar { font-size: .9rem; } }
+  </style>
+</head>
+<body>
+  <div id="loginPage">
+    <div id="loginBox">
+      <h2>Login</h2>
+      <input id="codeInput" placeholder="Enter your code" />
+      <button onclick="attemptLogin()">Get Started</button>
+      <div id="loginError"></div>
+    </div>
+  </div>
+  <div id="mainPage" class="hidden">
+    <header>Chemistry Explorer 🔬</header>
+    <div id="profile">
+      <span class="profile-icon">👤</span>
+      <div id="profileMenu">
+        <p id="userName"></p>
+        <button onclick="logout()">Logout</button>
+      </div>
+    </div>
+    <input type="text" id="searchBar" placeholder="Search element by name or symbol..." oninput="filterElements()" />
+    <div id="cardsContainer"></div>
+  </div>
+  <div id="welcomePopup"></div>
+  <script>
+    const users = {
+      '01': 'Abdul Jabbar Rashed',
+      '001': 'Rifat Hossen',
+      '002': 'Rafi',
+      '003': 'Shafin Dewan',
+      '004': 'Abdul jabbar',
+      '005': 'Abdul gaffar',
+      '006': 'Tohar',
+      '007': 'Mahim',
+      '008': 'Ibrahim'
+    };
+    function attemptLogin() {
+      const code = document.getElementById('codeInput').value.trim();
+      const errorDiv = document.getElementById('loginError');
+      if (users[code]) {
+        localStorage.setItem('chemUser', code);
+        showMain(users[code]);
+        document.getElementById('loginPage').remove();
+      } else {
+        errorDiv.textContent = 'Invalid code! Please try again.';
+      }
+    }
+    function showMain(name) {
+      document.getElementById('mainPage').classList.remove('hidden');
+      document.getElementById('userName').textContent = name;
+      showWelcome(name);
+    }
+    function showWelcome(name) {
+      const popup = document.getElementById('welcomePopup');
+      popup.textContent = 'Welcome, ' + name + '!';
+      popup.style.display = 'block';
+      setTimeout(() => { popup.style.display = 'none'; }, 2000);
+    }
+    function logout() {
+      localStorage.removeItem('chemUser');
+      location.reload();
+    }
+    document.getElementById('profile').addEventListener('click', () => {
+      const menu = document.getElementById('profileMenu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+    let elements = [];
+    async function loadData() {
+      const res = await fetch('https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json');
+      const json = await res.json();
+      elements = json.elements.filter(e => e.number <= 108);
+      renderCards(elements);
+    }
+    function filterElements() {
+      const q = document.getElementById('searchBar').value.toLowerCase();
+      const filtered = elements.filter(e => e.name.toLowerCase().includes(q) || e.symbol.toLowerCase().includes(q));
+      renderCards(filtered);
+    }
+    function renderCards(list) {
+      const container = document.getElementById('cardsContainer');
+      container.innerHTML = '';
+      list.forEach(el => {
+        const card = document.createElement('div'); card.className = 'element-card';
+        const hdr = document.createElement('div'); hdr.className = 'card-header';
+        hdr.innerHTML = `<h2>${el.symbol}</h2><small>${el.name}</small>`;
+        card.appendChild(hdr);
+        const body = document.createElement('div'); body.className = 'card-body';
+        body.innerHTML = `
+          <p><strong>Atomic No:</strong> ${el.number}</p>
+          <p><strong>Mass:</strong> ${el.atomic_mass.toFixed(2)}</p>
+          <p><strong>Group:</strong> ${el.group||'–'} | <strong>Period:</strong> ${el.period}</p>
+          <p><strong>Block:</strong> ${el.block.toUpperCase()}</p>
+          <p><strong>Electron Config:</strong> ${el.electron_configuration}</p>
+        `;
+        card.appendChild(body);
+        const canvas = document.createElement('canvas'); canvas.width=200; canvas.height=200;
+        card.appendChild(canvas);
+        const videoBtn = document.createElement('div'); videoBtn.className = 'video-toggle'; videoBtn.textContent = '▶';
+        card.appendChild(videoBtn);
+        let rotating = false, angle = 0;
+        function draw() {
+          const ctx = canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height);
+          const shellCounts = {}; el.electron_configuration.split(' ').forEach(term=>{
+            const shell = parseInt(term[0]); const cnt = parseInt(term.match(/\d+$/)[0]);
+            shellCounts[shell] = (shellCounts[shell]||0) + cnt;
+          });
+          const maxS = Math.max(...Object.keys(shellCounts));
+          for(let s=1; s<=maxS; s++){
+            const r=(canvas.width*0.4)*s/maxS;
+            ctx.beginPath(); ctx.arc(canvas.width/2,canvas.height/2,r,0,2*Math.PI);
+            ctx.strokeStyle='#888'; ctx.lineWidth=1; ctx.stroke();
+            const eCnt = shellCounts[s]||0;
+            for(let i=0; i<eCnt; i++){
+              const a = (2*Math.PI/eCnt)*i + angle;
+              const x = canvas.width/2 + Math.cos(a)*r, y = canvas.height/2 + Math.sin(a)*r;
+              ctx.beginPath(); ctx.arc(x,y,4,0,2*Math.PI); ctx.fillStyle='#4facfe'; ctx.fill();
+            }
+          }
+        }
+        function animate() {
+          if(!rotating) return;
+          angle += 0.02;
+          draw();
+          requestAnimationFrame(animate);
+        }
+        videoBtn.onclick = () => {
+          rotating = !rotating;
+          videoBtn.textContent = rotating ? '⏸' : '▶';
+          if(rotating) animate();
+        };
+        draw();
+        container.appendChild(card);
+      });
+    }
+    window.addEventListener('load', () => {
+      const storedCode = localStorage.getItem('chemUser');
+      if (storedCode && users[storedCode]) {
+        document.getElementById('loginPage').remove();
+        showMain(users[storedCode]);
+      }
+      loadData();
+    });
+  </script>
+</body>
+</html>
