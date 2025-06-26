@@ -104,7 +104,16 @@
       renderCards(elements);
     }
     function filterElements() {
-      const q = document.getElementById('searchBar').value.toLowerCase();
+      const q =document.getElementById('searchBar')
+                    .value
+                    .toLowerCase()
+                    .trim();
+
+  // যদি "table" লেখা হয় তাহলে Periodic Table দেখাও
+  if (q === 'table' || q.includes('table')) {
+    showPTable();
+    return;
+    }
       const filtered = elements.filter(e => e.name.toLowerCase().includes(q) || e.symbol.toLowerCase().includes(q));
       renderCards(filtered);
     }
