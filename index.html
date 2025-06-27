@@ -177,6 +177,25 @@
           }
         }
 // Explorer লুকিয়ে, Pe
+        // Explorer লুকিয়ে, Periodic Table দেখানোর ফাংশন
+function showPTable() {
+  // কার্ডগুলো লুকাবে
+  document.getElementById('cardsContainer').style.display = 'none';
+  // ptable সেকশন দেখাবে
+  document.getElementById('ptable').style.display = 'block';
+    }
+        // পিরিয়ড টেবিলের ছবি অ্যানিমেট করার ফাংশন
+function togglePTableAnim() {
+  const img = document.getElementById('ptableImg');
+  if (!img.style.animation) {
+    img.style.animation = 'breakTable 1s ease-in-out';
+  } else {
+    img.style.animation = '';
+  }
+  // icon টেক্সট টগল (▶ ↔ ⏸)
+  const btn = document.querySelector('.video-toggle-pt');
+  btn.textContent = img.style.animation ? '⏸' : '▶';
+    }
         function animate() {
           if(!rotating) return;
           angle += 0.02;
