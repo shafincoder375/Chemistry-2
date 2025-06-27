@@ -30,6 +30,15 @@
     .card-body { padding: .75rem 1rem; font-size: .9rem; line-height: 1.4; }
     .video-toggle { position: absolute; bottom: .5rem; right: .5rem; background: rgba(0,0,0,0.5); padding: .3rem .5rem; border-radius: 6px; color: #fff; cursor: pointer; }
     @media (max-width: 600px) { header { font-size: 1.5rem; } #searchBar { font-size: .9rem; } }
+#ptable { display: none; }
+@keyframes breakTable {
+  0%   { transform: translate(0,0) scale(1); }
+  20%  { transform: translate(-5px,5px) rotate(-2deg); }
+  40%  { transform: translate(5px,-5px) rotate(2deg) scale(0.98); }
+  60%  { transform: translate(-5px,-5px) rotate(1deg); }
+  80%  { transform: translate(5px,5px) rotate(-1deg) scale(1.02); }
+  100% { transform: translate(0,0) scale(1); }
+}
   </style>
 </head>
 <body>
@@ -167,6 +176,7 @@
             }
           }
         }
+// Explorer লুকিয়ে, Pe
         function animate() {
           if(!rotating) return;
           angle += 0.02;
