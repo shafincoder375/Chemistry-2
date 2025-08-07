@@ -2,207 +2,272 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Voice IELTS Testing</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>IELTS Certificate Generator</title>
   <style>
-    /* Custom styles */
-    .fade-in { animation: fadeIn 0.5s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .card { @apply bg-white rounded-2xl shadow-lg p-6; }
-    .btn-primary { @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl shadow; }
-    .btn-disabled { @apply bg-gray-400 text-gray-200 cursor-not-allowed; }
-    .hidden { display: none; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      margin-top: 40px;
+    }
+    h2 {
+      text-align: center;
+      color: #0a58ca;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #0a58ca;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+    }
+    .hidden {
+      display: none;
+    }
+    #certificate {
+      background: linear-gradient(45deg, #c0e0fc, #ffffff);
+      border: 2px solid #007bff;
+      border-radius: 15px;
+      padding: 30px;
+      margin-top: 20px;
+      font-family: 'Georgia', serif;
+    }
+    #certificate h3 {
+      text-align: center;
+      color: #0056b3;
+    }
   </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800">
-  <div class="min-h-screen flex items-center justify-center">
-    <div id="form-section" class="w-full max-w-lg card">
-      <h1 class="text-2xl font-bold text-center mb-6">Voice IELTS Testing</h1>
-      <form id="infoForm" class="space-y-4">
-        <div>
-          <label class="block font-medium">Full Name</label>
-          <input type="text" id="fullName" class="w-full border rounded-lg p-2" required />
-        </div>
-        <div>
-          <label class="block font-medium">Date</label>
-          <input type="date" id="examDate" class="w-full border rounded-lg p-2" required />
-        </div>
-        <div>
-          <label class="block font-medium">Institution Name</label>
-          <input type="text" id="institution" class="w-full border rounded-lg p-2" required />
-        </div>
-        <div>
-          <label class="block font-medium">Examiner Number</label>
-          <input type="text" id="examinerNo" class="w-full border rounded-lg p-2" required />
-        </div>
-        <div>
-          <label class="block font-medium">Candidate Number</label>
-          <input type="text" id="candidateNo" class="w-full border rounded-lg p-2" required />
-        </div>
-        <button type="submit" class="btn-primary w-full">Start Test</button>
-      </form>
-    </div>
-  </div>  <!-- Ready Page -->  <div id="ready-section" class="min-h-screen flex items-center justify-center hidden fade-in">
-    <div class="card w-full max-w-md text-center">
-      <h2 class="text-xl font-semibold mb-4">Ready to Begin?</h2>
-      <button id="startTestBtn" class="btn-primary">Yes, I'm Ready</button>
-    </div>
-  </div>  <!-- Speaking Questions -->  <div id="speaking-section" class="min-h-screen flex items-center justify-center hidden fade-in">
-    <div class="card w-full max-w-xl">
-      <h2 id="speakingTitle" class="text-xl font-semibold mb-4">Speaking Section</h2>
-      <div class="space-y-6">
-        <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
-          <p id="questionText" class="text-gray-800 text-lg"></p>
-        </div>
-        <div class="flex space-x-4">
-          <button id="recordBtn" class="btn-primary flex-1">Start Speaking</button>
-          <button id="nextQBtn" class="btn-disabled flex-1" disabled>Next</button>
-        </div>
-      </div>
-    </div>
-  </div>  <!-- Reading Section -->  <div id="reading-section" class="min-h-screen flex items-center justify-center hidden fade-in">
-    <div class="card w-full max-w-xl">
-      <h2 class="text-xl font-semibold mb-4">Reading & Speaking</h2>
-      <div class="bg-blue-50 rounded-lg p-4 mb-4" id="readingText"></div>
-      <div class="flex space-x-4">
-        <button id="readRecordBtn" class="btn-primary flex-1">Start Speaking</button>
-        <button id="readSubmitBtn" class="btn-disabled flex-1" disabled>Submit</button>
-      </div>
-    </div>
-  </div>  <!-- Listening & Typing Section -->  <div id="listening-section" class="min-h-screen flex items-center justify-center hidden fade-in">
-    <div class="card w-full max-w-xl">
-      <h2 class="text-xl font-semibold mb-4">Listening & Typing</h2>
-      <p id="listenPrompt" class="mb-4"></p>
-      <button id="playAudioBtn" class="btn-primary mb-4">Play Audio Once</button>
-      <textarea id="typedInput" class="w-full border rounded-lg p-2 mb-4" rows="5" placeholder="Type what you heard..."></textarea>
-      <button id="listenSubmitBtn" class="btn-primary w-full">Submit Answer</button>
-    </div>
-  </div>  <!-- Result & Certificate -->  <div id="result-section" class="min-h-screen flex items-center justify-center hidden fade-in">
-    <div class="card w-full max-w-lg text-center">
-      <h2 class="text-2xl font-bold mb-4">Test Completed</h2>
-      <p class="text-lg mb-2">Your Overall IELTS Band: <span id="overallScore" class="font-semibold"></span></p>
-      <p class="mb-4">Suggested Countries: <span id="suggestedCountries" class="font-medium"></span></p>
-      <div class="border-2 border-blue-600 rounded-xl p-6 bg-blue-50">        
-        <h3 class="text-xl font-semibold mb-2">Certificate of Achievement</h3>
-        <p>Name: <span id="certNameDisp"></span></p>
-        <p>Date: <span id="certDateDisp"></span></p>
-        <p>Examiner No: <span id="certExaminerDisp"></span></p>
-        <p>Candidate No: <span id="certCandidateDisp"></span></p>
-        <p>IELTS Band: <span id="certBandDisp"></span></p>
-      </div>
-      <button id="downloadCertBtn" class="btn-primary mt-6">Download PDF</button>
-    </div>
-  </div>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script>
-    // Sections
-    const formSec = document.getElementById('form-section');
-    const readySec = document.getElementById('ready-section');
-    const speakSec = document.getElementById('speaking-section');
-    const readSec = document.getElementById('reading-section');
-    const listenSec = document.getElementById('listening-section');
-    const resultSec = document.getElementById('result-section');
+<body>
+  <div class="container" id="step1">
+    <h2>Candidate Information</h2>
+    <input type="text" id="fullName" placeholder="Full Name" required />
+    <input type="date" id="testDate" value="2025-08-07" />
+    <input type="text" id="institution" placeholder="Institution Name" />
+    <input type="text" id="candidateNumber" placeholder="Candidate Number" />
+    <input type="text" id="examNumber" placeholder="Examination Number" />
+    <button onclick="goToStep2()">Start</button>
+  </div>  <div class="container hidden" id="step2">
+    <h2>Test Scores</h2>
+    <input type="number" id="listening" placeholder="Listening (0-9)" min="0" max="9" />
+    <input type="number" id="reading" placeholder="Reading (0-9)" min="0" max="9" />
+    <input type="number" id="writing" placeholder="Writing (0-9)" min="0" max="9" />
+    <input type="number" id="speaking" placeholder="Speaking (0-9)" min="0" max="9" />
+    <button onclick="calculateResults()">Calculate</button>
+    <div id="certificate" class="hidden"></div>
+  </div>  <script>
+    let formData = {};
 
-    // Form
-    document.getElementById('examDate').valueAsDate = new Date();
-    document.getElementById('infoForm').addEventListener('submit', e => {
-      e.preventDefault();
-      formSec.classList.add('hidden');
-      readySec.classList.remove('hidden');
-    });
-    document.getElementById('startTestBtn').addEventListener('click', () => {
-      readySec.classList.add('hidden');
-      initSpeaking();
-    });
+    function goToStep2() {
+      formData.fullName = document.getElementById("fullName").value;
+      formData.testDate = document.getElementById("testDate").value;
+      formData.institution = document.getElementById("institution").value;
+      formData.candidateNumber = document.getElementById("candidateNumber").value;
+      formData.examNumber = document.getElementById("examNumber").value;
 
-    // Speaking
-    const questions = [...Array(30)].map((_, i) => `Question ${i+1}`);
-    let idx = 0, spScores = [];
-    const qText = document.getElementById('questionText');
-    const recordBtn = document.getElementById('recordBtn');
-    const nextQBtn = document.getElementById('nextQBtn');
-    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    function initSpeaking() { speakSec.classList.remove('hidden'); showQ(); }
-    function showQ() {
-      qText.innerText = questions[idx]; nextQBtn.disabled = true; recordBtn.disabled = false;
-      const ut = new SpeechSynthesisUtterance(questions[idx]); window.speechSynthesis.speak(ut);
-    }
-    const recog = new SpeechRec(); recog.interimResults = false; recog.lang = 'en-US';
-    recordBtn.addEventListener('click', () => { recordBtn.disabled = true; recog.start(); });
-    recog.addEventListener('result', e => {
-      const transcript = e.results[0][0].transcript;
-      const kws = questions[idx].split(' ').slice(0,3);
-      let m=0; kws.forEach(k=>{ if(transcript.includes(k)) m++; });
-      spScores.push(Math.min(9,3+m)); nextQBtn.disabled=false;
-    });
-    recog.addEventListener('end', ()=>recordBtn.disabled=false);
-    nextQBtn.addEventListener('click', ()=>{
-      idx++;
-      if(idx<questions.length) showQ(); else {
-        speakSec.classList.add('hidden'); initReading();
-      }
-    });
-
-    // Reading
-    let startT;
-    document.getElementById('readingText').innerText = `Read aloud: "The IELTS reading paragraph goes here..."`;
-    document.getElementById('readRecordBtn').addEventListener('click', ()=>{
-      startT = Date.now(); document.getElementById('readSubmitBtn').disabled=false;
-    });
-    document.getElementById('readSubmitBtn').addEventListener('click', ()=>{
-      const dur = (Date.now()-startT)/1000;
-      const score = dur<45?6:dur<65?7.5:8.5;
-      spScores.push(score); readSec.classList.add('hidden'); initListening();
-    });
-    function initReading(){ readSec.classList.remove('hidden'); }
-
-    // Listening
-    const listenPrompt = document.getElementById('listenPrompt');
-    const audioText = "The listening audio script at IELTS pace...";
-    let played=false;
-    document.getElementById('playAudioBtn').addEventListener('click', ()=>{
-      if(!played){ new SpeechSynthesisUtterance(audioText); window.speechSynthesis.speak(audioText); played=true; }
-    });
-    document.getElementById('listenSubmitBtn').addEventListener('click', ()=>{
-      const user = document.getElementById('typedInput').value.toLowerCase().split(/\s+/);
-      const orig = audioText.toLowerCase().split(/\s+/);
-      const correct = user.filter(w=>orig.includes(w)).length;
-      const score = Math.round((correct/orig.length)*100);
-      spScores.push(score/10);
-      listenSec.classList.add('hidden'); computeResult();
-    });
-    function initListening(){ listenSec.classList.remove('hidden'); listenPrompt.innerText="Listen and type:"; }
-
-    // Result
-    function computeResult(){
-      resultSec.classList.remove('hidden');
-      const avg = (spScores.reduce((a,b)=>a+b,0)/spScores.length).toFixed(1);
-      document.getElementById('overallScore').innerText = avg;
-      const bands = [[8, ['UK','Canada','Australia','USA','NZ']],[7, ['Canada','Australia','Germany','Ireland']],[6,['Germany','Poland','Netherlands','Hungary']],[5,['Malaysia','UAE','Turkey']],[0,['Basic English programs']]];
-      const countries = bands.find(b=>avg>=b[0])[1].join(', ');
-      document.getElementById('suggestedCountries').innerText = countries;
-      // Fill certificate
-      ['Name','Date','Examiner','Candidate','Band'].forEach((f,i)=>{
-        document.getElementById(['certNameDisp','certDateDisp','certExaminerDisp','certCandidateDisp','certBandDisp'][i]).innerText =
-          [document.getElementById('fullName').value, document.getElementById('examDate').value,
-           document.getElementById('examinerNo').value, document.getElementById('candidateNo').value, avg][i];
-      });
+      document.getElementById("step1").classList.add("hidden");
+      document.getElementById("step2").classList.remove("hidden");
     }
 
-    // PDF
-    document.getElementById('downloadCertBtn').addEventListener('click', ()=>{
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF(); doc.setFontSize(16);
-      doc.text('IELTS Voice Testing Certificate',20,20);
-      const lines = [
-        `Name: ${document.getElementById('fullName').value}`,
-        `Date: ${document.getElementById('examDate').value}`,
-        `Examiner No: ${document.getElementById('examinerNo').value}`,
-        `Candidate No: ${document.getElementById('candidateNo').value}`,
-        `Band: ${document.getElementById('overallScore').innerText}`
-      ];
-      lines.forEach((l,i)=>doc.text(l,20,40+(i*10)));
-      doc.save('IELTS_Certificate.pdf');
-    });
-  </script></body>
-  </html>
+    function suggestCountry(score) {
+      if (score >= 8.0) return "UK, Canada, Australia, USA, New Zealand";
+      if (score >= 7.0) return "Canada, Australia, Germany, Ireland";
+      if (score >= 6.0) return "Germany, Poland, Netherlands, Hungary";
+      if (score >= 5.0) return "Malaysia, UAE, Turkey";
+      return "Basic English-speaking programs only";
+    }
+
+    function calculateResults() {
+      const listening = parseFloat(document.getElementById("listening").value);
+      const reading = parseFloat(document.getElementById("reading").value);
+      const writing = parseFloat(document.getElementById("writing").value);
+      const speaking = parseFloat(document.getElementById("speaking").value);
+      const total = listening + reading + writing + speaking;
+      const average = (total / 4).toFixed(1);
+      const countries = suggestCountry(average);
+
+      const cert = `
+        <h3>IELTS Certificate</h3>
+        <p><strong>Name:</strong> ${formData.fullName}</p>
+        <p><strong>Date:</strong> ${formData.testDate}</p>
+        <p><strong>Institution:</strong> ${formData.institution}</p>
+        <p><strong>Candidate No:</strong> ${formData.candidateNumber}</p>
+        <p><strong>Exam No:</strong> ${formData.examNumber}</p>
+        <p><strong>IELTS Score:</strong> ${average}</p>
+        <p><strong>Eligible Countries:</strong> ${countries}</p>
+        <button onclick="downloadPDF()">Download Certificate (PDF)</button>
+      `;
+
+      const certDiv = document.getElementById("certificate");
+      certDiv.innerHTML = cert;
+      certDiv.classList.remove("hidden");
+    }
+
+    function downloadPDF() {
+      const element = document.getElementById("certificate");
+      const opt = {
+        margin:       0.5,
+        filename:     `IELTS_Certificate_${formData.fullName}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      html2pdf().from(element).set(opt).save();
+    }
+  </script>  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script></body>
+  </html><!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IELTS Certificate Generator</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      margin-top: 40px;
+    }
+    h2 {
+      text-align: center;
+      color: #0a58ca;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #0a58ca;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+    }
+    .hidden {
+      display: none;
+    }
+    #certificate {
+      background: linear-gradient(45deg, #c0e0fc, #ffffff);
+      border: 2px solid #007bff;
+      border-radius: 15px;
+      padding: 30px;
+      margin-top: 20px;
+      font-family: 'Georgia', serif;
+    }
+    #certificate h3 {
+      text-align: center;
+      color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="step1">
+    <h2>Candidate Information</h2>
+    <input type="text" id="fullName" placeholder="Full Name" required />
+    <input type="date" id="testDate" value="2025-08-07" />
+    <input type="text" id="institution" placeholder="Institution Name" />
+    <input type="text" id="candidateNumber" placeholder="Candidate Number" />
+    <input type="text" id="examNumber" placeholder="Examination Number" />
+    <button onclick="goToStep2()">Start</button>
+  </div>  <div class="container hidden" id="step2">
+    <h2>Test Scores</h2>
+    <input type="number" id="listening" placeholder="Listening (0-9)" min="0" max="9" />
+    <input type="number" id="reading" placeholder="Reading (0-9)" min="0" max="9" />
+    <input type="number" id="writing" placeholder="Writing (0-9)" min="0" max="9" />
+    <input type="number" id="speaking" placeholder="Speaking (0-9)" min="0" max="9" />
+    <button onclick="calculateResults()">Calculate</button>
+    <div id="certificate" class="hidden"></div>
+  </div>  <script>
+    let formData = {};
+
+    function goToStep2() {
+      formData.fullName = document.getElementById("fullName").value;
+      formData.testDate = document.getElementById("testDate").value;
+      formData.institution = document.getElementById("institution").value;
+      formData.candidateNumber = document.getElementById("candidateNumber").value;
+      formData.examNumber = document.getElementById("examNumber").value;
+
+      document.getElementById("step1").classList.add("hidden");
+      document.getElementById("step2").classList.remove("hidden");
+    }
+
+    function suggestCountry(score) {
+      if (score >= 8.0) return "UK, Canada, Australia, USA, New Zealand";
+      if (score >= 7.0) return "Canada, Australia, Germany, Ireland";
+      if (score >= 6.0) return "Germany, Poland, Netherlands, Hungary";
+      if (score >= 5.0) return "Malaysia, UAE, Turkey";
+      return "Basic English-speaking programs only";
+    }
+
+    function calculateResults() {
+      const listening = parseFloat(document.getElementById("listening").value);
+      const reading = parseFloat(document.getElementById("reading").value);
+      const writing = parseFloat(document.getElementById("writing").value);
+      const speaking = parseFloat(document.getElementById("speaking").value);
+      const total = listening + reading + writing + speaking;
+      const average = (total / 4).toFixed(1);
+      const countries = suggestCountry(average);
+
+      const cert = `
+        <h3>IELTS Certificate</h3>
+        <p><strong>Name:</strong> ${formData.fullName}</p>
+        <p><strong>Date:</strong> ${formData.testDate}</p>
+        <p><strong>Institution:</strong> ${formData.institution}</p>
+        <p><strong>Candidate No:</strong> ${formData.candidateNumber}</p>
+        <p><strong>Exam No:</strong> ${formData.examNumber}</p>
+        <p><strong>IELTS Score:</strong> ${average}</p>
+        <p><strong>Eligible Countries:</strong> ${countries}</p>
+        <button onclick="downloadPDF()">Download Certificate (PDF)</button>
+      `;
+
+      const certDiv = document.getElementById("certificate");
+      certDiv.innerHTML = cert;
+      certDiv.classList.remove("hidden");
+    }
+
+    function downloadPDF() {
+      const element = document.getElementById("certificate");
+      const opt = {
+        margin:       0.5,
+        filename:     `IELTS_Certificate_${formData.fullName}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      html2pdf().from(element).set(opt).save();
+    }
+  </script>  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script></body>
+      </html>
